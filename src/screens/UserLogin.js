@@ -44,9 +44,23 @@ const UserLoginPage = ({navigation}) => {
         setLoading(true);
         try{
           const response = await axiosLogin.post('/login', {userName:data.userName, password:data.password});
-          if(response.data && response.data.data){
-            const {token, fullName, role, phoneNumber, registrationNumber} = response.data.data;
-            signin({token, fullName, role, phoneNumber, registrationNumber});
+          if(response.data && response.data.token){
+            const {token, userName, role, message} = response.data;
+            // Store the token and user data
+            signin({token, fullName: userName, role, phoneNumber: '', registrationNumber: ''});
+            // Check if login was successful
+            if(message === "User login successfull."){
+              // Redirect to dashboard (home page)
+              navigation.dispatch(
+                CommonActions.reset({
+                  index: 0,
+                  routes: [{ name: 'Dashboard' }],
+                })
+              );
+            } else {
+              showModal();
+            }
+          } else {
             showModal();
           }
         }
