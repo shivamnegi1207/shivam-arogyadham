@@ -17,7 +17,7 @@ const LandingPage = ({navigation}) => {
     try {
       const token = await AsyncStorage.getItem('X-ACCESS-TOKEN');
       if (token) {
-        const response = await axiosAuth.get('/user/get-logged-in-user');
+        const response = await axiosAuth.get('/user');
         if (response.data && response.data.data) {
           const {fullName, role, phoneNumber, registrationNumber} = response.data.data;
           signin({ token, fullName, role, phoneNumber, registrationNumber });

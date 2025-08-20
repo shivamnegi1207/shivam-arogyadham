@@ -25,7 +25,7 @@ const DashboardPage = ({ navigation }) => {
 
   const getMappedSounds = async () => {
     try {
-      const response = await axiosAuth.get('/sounds/get-all-map-sounds');
+      const response = await axiosAuth.get('/sounds');
       if (response.data && response.data.data) {
         const { docs } = response.data.data;
         setSounds(docs);
