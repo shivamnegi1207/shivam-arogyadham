@@ -99,7 +99,7 @@ const UserLoginPage = ({navigation}) => {
               onChangeText={text => handleUserNameChange(text)}
               placeholderTextColor="#2D2D2Dcc"
               dense
-              label={<Text style={UserLoginStyle.inputText.label}>उपयोगकर्ता नाम</Text>}
+             label="उपयोगकर्ता नाम"
               placeholder="उपयोगकर्ता नाम"
               style={UserLoginStyle.inputText}
               outlineColor="#2D2D2Dcc"
@@ -127,7 +127,7 @@ const UserLoginPage = ({navigation}) => {
               placeholderTextColor="#2D2D2Dcc"
               dense
               secureTextEntry
-              label={<Text style={UserLoginStyle.inputText.label}>पासवर्ड</Text>}
+             label="पासवर्ड"
               placeholder="पासवर्ड"
               style={UserLoginStyle.inputText}
               outlineColor="#2D2D2Dcc"
