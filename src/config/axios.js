@@ -53,3 +53,5 @@ axiosLocal.interceptors.response.use(
     return Promise.reject(error);
   }
 );
+
+export { axiosAuth, axiosLocal, axiosLogin, baseURL };
