@@ -2,7 +2,9 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-const baseURL = "https://admin.arogyapath.in/api/"
+const baseURL = "https://arogyadham.giksindia.com/app/v1/"
+const loginBaseURL = "https://admin.arogyapath.in/api/"
+
 const axiosAuth = axios.create({
   baseURL: baseURL, // Replace with your API base URL
 });
@@ -26,6 +28,10 @@ const axiosLocal = axios.create({
     baseURL: baseURL, // Replace with your API base URL
   });
 
+const axiosLogin = axios.create({
+    baseURL: loginBaseURL, // For login API only
+  });
+
 axiosLocal.interceptors.request.use(
   async (config) => {
     console.log('Request:', config);
@@ -47,5 +53,3 @@ axiosLocal.interceptors.response.use(
     return Promise.reject(error);
   }
 );
-
-export { axiosAuth, axiosLocal, baseURL };
