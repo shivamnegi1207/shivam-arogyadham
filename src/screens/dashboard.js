@@ -199,7 +199,7 @@ const DashboardPage = ({ navigation }) => {
 
         <Text style={{ flex: 1 }}>{item?.soundId?.title || ""}</Text>
         <Text style={{ textAlign: 'right', flex: 1 }}>
-          {formatTime(soundProgress[item._id] * soundDuration[item._id] || 0)} / {formatTime(soundDuration[item._id] || 0)}
+          {String(formatTime(soundProgress[item._id] * soundDuration[item._id] || 0))} / {String(formatTime(soundDuration[item._id] || 0))}
         </Text>
       </TouchableOpacity>
 

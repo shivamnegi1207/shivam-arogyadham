@@ -80,17 +80,17 @@ const ExercisePage = ({ navigation }) => {
                 {consultationData.preferedExercises.map((exercise, index) => (
                   <View key={index} style={{marginBottom:15,padding:15,backgroundColor:'#f8f9fa',borderRadius:8}}>
                     <Text style={{fontSize:16,fontWeight:'bold',color:'#2D2D2D',marginBottom:5}}>
-                      {exercise.exercise_hi_name || exercise.exercise_name || 'व्यायाम'}
+                      {String(exercise.exercise_hi_name || exercise.exercise_name || 'व्यायाम')}
                     </Text>
                     <Text style={{fontSize:14,color:'#5F5F5F',marginBottom:3}}>
-                      अवधि: {exercise.duration || 'N/A'} मिनट
+                      अवधि: {String(exercise.duration || 'N/A')} मिनट
                     </Text>
                     <Text style={{fontSize:14,color:'#5F5F5F',marginBottom:3}}>
-                      दोहराव: {exercise.repetitions || 'N/A'}
+                      दोहराव: {String(exercise.repetitions || 'N/A')}
                     </Text>
                     {exercise.description && (
                       <Text style={{fontSize:13,color:'#5F5F5F',marginTop:5,lineHeight:18}}>
-                        विवरण: {exercise.description}
+                        विवरण: {String(exercise.description)}
                       </Text>
                     )}
                   </View>
@@ -104,7 +104,7 @@ const ExercisePage = ({ navigation }) => {
                 <Text style={{fontSize:18,fontWeight:'bold',marginBottom:15,color:'#01c43d'}}>व्यायाम निर्देश</Text>
                 {consultationData.instructions.exercise_instruction.map((instruction, index) => (
                   <Text key={index} style={{fontSize:14,color:'#2D2D2D',marginBottom:8,lineHeight:20}}>
-                    • {instruction}
+                    • {String(instruction)}
                   </Text>
                 ))}
               </View>

@@ -80,7 +80,7 @@ const DietPage = ({ navigation }) => {
                 {consultationData.diets.diet_to_take.map((diet, index) => (
                   <View key={index} style={{marginBottom:10,padding:15,backgroundColor:'#e8f5e8',borderRadius:8}}>
                     <Text style={{fontSize:16,color:'#2D2D2D',fontWeight:'500'}}>
-                      • {diet}
+                      • {String(diet)}
                     </Text>
                   </View>
                 ))}
@@ -94,7 +94,7 @@ const DietPage = ({ navigation }) => {
                 {consultationData.diets.diet_not_to_take.map((diet, index) => (
                   <View key={index} style={{marginBottom:10,padding:15,backgroundColor:'#ffeaea',borderRadius:8}}>
                     <Text style={{fontSize:16,color:'#2D2D2D',fontWeight:'500'}}>
-                      • {diet}
+                      • {String(diet)}
                     </Text>
                   </View>
                 ))}

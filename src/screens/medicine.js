@@ -80,16 +80,16 @@ const MedicinePage = ({ navigation }) => {
                 {consultationData.prescribedMedicine.map((medicine, index) => (
                   <View key={index} style={{marginBottom:15,padding:15,backgroundColor:'#f8f9fa',borderRadius:8}}>
                     <Text style={{fontSize:16,fontWeight:'bold',color:'#2D2D2D',marginBottom:5}}>
-                      {medicine.medicine_name || 'दवा का नाम'}
+                      {String(medicine.medicine_name || 'दवा का नाम')}
                     </Text>
                     <Text style={{fontSize:14,color:'#5F5F5F',marginBottom:3}}>
-                      खुराक: {medicine.dosage || 'N/A'}
+                      खुराक: {String(medicine.dosage || 'N/A')}
                     </Text>
                     <Text style={{fontSize:14,color:'#5F5F5F',marginBottom:3}}>
-                      आवृत्ति: {medicine.frequency || 'N/A'}
+                      आवृत्ति: {String(medicine.frequency || 'N/A')}
                     </Text>
                     <Text style={{fontSize:14,color:'#5F5F5F'}}>
-                      अवधि: {medicine.duration || 'N/A'}
+                      अवधि: {String(medicine.duration || 'N/A')}
                     </Text>
                   </View>
                 ))}
@@ -102,7 +102,7 @@ const MedicinePage = ({ navigation }) => {
                 <Text style={{fontSize:18,fontWeight:'bold',marginBottom:15,color:'#01c43d'}}>दवा निर्देश</Text>
                 {consultationData.instructions.medicine_instruction.map((instruction, index) => (
                   <Text key={index} style={{fontSize:14,color:'#2D2D2D',marginBottom:8,lineHeight:20}}>
-                    • {instruction}
+                    • {String(instruction)}
                   </Text>
                 ))}
               </View>
@@ -113,7 +113,7 @@ const MedicinePage = ({ navigation }) => {
               <View style={{backgroundColor:'white',padding:20,borderRadius:10,marginBottom:20}}>
                 <Text style={{fontSize:18,fontWeight:'bold',marginBottom:15,color:'#01c43d'}}>विशेष निर्देश</Text>
                 <Text style={{fontSize:14,color:'#2D2D2D',lineHeight:20}}>
-                  {consultationData.medicineDetails.medicine_custom_inst}
+                  {String(consultationData.medicineDetails.medicine_custom_inst || '')}
                 </Text>
               </View>
             )}

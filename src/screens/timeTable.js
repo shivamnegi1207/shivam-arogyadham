@@ -85,15 +85,15 @@ const TimeTablePage = ({ navigation }) => {
                 {consultationData.time_table.map((schedule, index) => (
                   <View key={index} style={{marginBottom:15,padding:15,backgroundColor:'#f8f9fa',borderRadius:8}}>
                     <Text style={{fontSize:16,fontWeight:'bold',color:'#2D2D2D',marginBottom:5}}>
-                      {schedule.description || 'गतिविधि'}
+                      {String(schedule.description || 'गतिविधि')}
                     </Text>
                     <View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:5}}>
                       <Text style={{fontSize:14,color:'#5F5F5F'}}>
-                        शुरुआत का समय: {formatTime(schedule.startTime)}
+                        शुरुआत का समय: {String(formatTime(schedule.startTime))}
                       </Text>
                       {schedule.endTime && (
                         <Text style={{fontSize:14,color:'#5F5F5F'}}>
-                          समाप्ति का समय: {formatTime(schedule.endTime)}
+                          समाप्ति का समय: {String(formatTime(schedule.endTime))}
                         </Text>
                       )}
                     </View>
@@ -104,7 +104,7 @@ const TimeTablePage = ({ navigation }) => {
                         </Text>
                         {schedule.medicines.map((medicine, medIndex) => (
                           <Text key={medIndex} style={{fontSize:13,color:'#5F5F5F',marginLeft:10}}>
-                            • {medicine}
+                            • {String(medicine)}
                           </Text>
                         ))}
                       </View>
