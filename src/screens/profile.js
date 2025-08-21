@@ -49,6 +49,7 @@ const ProfilePage = ({ navigation }) => {
   const handleSignOut = () => {
     logout(navigation);
   }
+}
 
 
 export default ProfilePage;
