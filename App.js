@@ -11,6 +11,11 @@ import { Provider as AuthProvider } from './src/context/AuthContext';
 // import InitialPage from './src/screens/initialScreen';
 import DashboardPage from './src/screens/dashboard';
 import ProfilePage from './src/screens/profile';
+import MedicinePage from './src/screens/medicine';
+import ExercisePage from './src/screens/exercise';
+import DietPage from './src/screens/diet';
+import TimeTablePage from './src/screens/timeTable';
+import HealthPlanPage from './src/screens/healthPlan';
 
 const Stack = createNativeStackNavigator();
 
@@ -78,6 +83,11 @@ export default function App() {
         />
         <Stack.Screen name="Dashboard" component={DashboardPage} options={{headerShown:false}}/>
         <Stack.Screen name="Profile" component={ProfilePage} options={{headerShown:false}}/>
+        <Stack.Screen name="Medicine" component={MedicinePage} options={{headerShown:false}}/>
+        <Stack.Screen name="Exercise" component={ExercisePage} options={{headerShown:false}}/>
+        <Stack.Screen name="Diet" component={DietPage} options={{headerShown:false}}/>
+        <Stack.Screen name="TimeTable" component={TimeTablePage} options={{headerShown:false}}/>
+        <Stack.Screen name="HealthPlan" component={HealthPlanPage} options={{headerShown:false}}/>
       </Stack.Navigator>
     </NavigationContainer>
     </PaperProvider>

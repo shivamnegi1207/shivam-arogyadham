@@ -8,6 +8,8 @@ import AntDesign from '@expo/vector-icons/AntDesign';
 import EvilIcons from '@expo/vector-icons/EvilIcons';
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import Ionicons from '@expo/vector-icons/Ionicons';
 import Loader from "../components/loader";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -251,13 +253,16 @@ const DashboardPage = ({ navigation }) => {
     {/* Sticky Footer */}
     <View style={{ flexDirection: 'row', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
       <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('Profile')}>
-        <FontAwesome6 name="user-gear" size={28} color="#10331b" style={{ width: 30 }} />
+        <FontAwesome6 name="user-gear" size={24} color="#10331b" style={{ width: 30 }} />
       </Pressable>
       <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }}>
-        <FontAwesome6 name="music" size={35} color="#01c43d" style={{ width: 40 }} />
+        <FontAwesome6 name="music" size={30} color="#01c43d" style={{ width: 40 }} />
       </Pressable>
-      <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={handleSignOut}>
-        <MaterialIcons name="logout" size={28} color="#10331b" style={{ width: 30 }} />
+      <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('Medicine')}>
+        <MaterialCommunityIcons name="pill" size={24} color="#10331b" style={{ width: 30 }} />
+      </Pressable>
+      <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('HealthPlan')}>
+        <Ionicons name="fitness" size={24} color="#10331b" style={{ width: 30 }} />
       </Pressable>
     </View>
   </View>

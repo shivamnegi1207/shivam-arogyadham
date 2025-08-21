@@ -1,13 +1,51 @@
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { DashboardStyle } from "../styles/dashboard";
 import { Context as AuthContext } from '../context/AuthContext';
-import { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import MaterialIcons from '@expo/vector-icons/MaterialIcons';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { axiosLogin } from "../config/axios";
+import { Modal, Portal, Button } from "react-native-paper";
 
 const ProfilePage = ({ navigation }) => {
   const { state, logout } = useContext(AuthContext);
+  const [consultationDates, setConsultationDates] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [consultationData, setConsultationData] = useState(null);
+  const [showDateModal, setShowDateModal] = useState(false);
+  const [loading, setLoading] = useState(false);
 
+  const getConsultationDates = async () => {
+    try {
+      const response = await axiosLogin.get('/getPatientAllConsultationDates');
+      if (response.data && response.data.allDates) {
+        setConsultationDates(response.data.allDates);
+      }
+    } catch (error) {
+      console.warn(error.message || "Error fetching consultation dates");
+    }
+  };
+
+  const getConsultationData = async (date) => {
+    setLoading(true);
+    try {
+      const response = await axiosLogin.get(`/getPatientDetailByDate/${date}`);
+      if (response.data && response.data.data) {
+        setConsultationData(response.data.data);
+        setSelectedDate(date);
+      }
+    } catch (error) {
+      console.warn(error.message || "Error fetching consultation data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    getConsultationDates();
+  }, []);
   const handleSignOut = () => {
     logout(navigation);
   }
@@ -25,34 +63,137 @@ const ProfilePage = ({ navigation }) => {
           <Text style={DashboardStyle.subHeading}>
             Welcome {state.fullName || ''}
           </Text>
-          <View style={{flexDirection:'row',gap:20,paddingHorizontal:20}}>
+          
+          <View style={{flexDirection:'row',gap:20,paddingHorizontal:20,marginBottom:10}}>
             <Text style={{fontSize:16,textTransform:'uppercase',fontWeight:'500',flex:1}}>नाम</Text>
             <Text style={{fontSize:15,textTransform:'capitalize',fontWeight:'300',flex:1}}>{state.fullName || ''}</Text>
           </View>
-          <View style={{flexDirection:'row',gap:20,paddingHorizontal:20}}>
+          <View style={{flexDirection:'row',gap:20,paddingHorizontal:20,marginBottom:10}}>
             <Text style={{fontSize:16,textTransform:'uppercase',fontWeight:'500',flex:1}}>मोबाइल नंबर</Text>
             <Text style={{fontSize:15,textTransform:'capitalize',fontWeight:'300',flex:1}}>{state.phoneNumber || ''}</Text>
           </View>
-          <View style={{flexDirection:'row',gap:20,paddingHorizontal:20}}>
+          <View style={{flexDirection:'row',gap:20,paddingHorizontal:20,marginBottom:20}}>
             <Text style={{fontSize:16,textTransform:'uppercase',fontWeight:'500',flex:1}}>पंजीकरण संख्या</Text>
             <Text style={{fontSize:15,textTransform:'capitalize',fontWeight:'300',flex:1}}>{state.registrationNumber || ''}</Text>
           </View>
+          
+          {/* Contact Information */}
+          <View style={{backgroundColor:'white',padding:20,borderRadius:10,marginBottom:20}}>
+            <Text style={{fontSize:18,fontWeight:'bold',marginBottom:15,color:'#01c43d'}}>संपर्क जानकारी</Text>
+            <View style={{marginBottom:10}}>
+              <Text style={{fontSize:14,fontWeight:'500',color:'#2D2D2D'}}>पता:</Text>
+              <Text style={{fontSize:13,color:'#5F5F5F'}}>Jadi Buti Farms, Kolhupani, Uttarakhand 248007</Text>
+            </View>
+            <View style={{marginBottom:10}}>
+              <Text style={{fontSize:14,fontWeight:'500',color:'#2D2D2D'}}>ईमेल:</Text>
+              <Text style={{fontSize:13,color:'#5F5F5F'}}>info@arogyapath.org</Text>
+            </View>
+            <View>
+              <Text style={{fontSize:14,fontWeight:'500',color:'#2D2D2D'}}>समय:</Text>
+              <Text style={{fontSize:13,color:'#5F5F5F'}}>सोमवार से रविवार: सुबह 9 बजे से शाम 4 बजे तक</Text>
+            </View>
+          </View>
+
+          {/* Consultation Dates */}
+          <View style={{backgroundColor:'white',padding:20,borderRadius:10,marginBottom:20}}>
+            <Text style={{fontSize:18,fontWeight:'bold',marginBottom:15,color:'#01c43d'}}>परामर्श तिथियां</Text>
+            <Pressable 
+              style={{backgroundColor:'#01c43d',padding:10,borderRadius:5,alignItems:'center'}}
+              onPress={() => setShowDateModal(true)}
+            >
+              <Text style={{color:'white',fontWeight:'bold'}}>तिथि चुनें</Text>
+            </Pressable>
+            {selectedDate && (
+              <Text style={{marginTop:10,fontSize:14,color:'#2D2D2D'}}>
+                चयनित तिथि: {selectedDate}
+              </Text>
+            )}
+          </View>
+
+          {/* Payment Details */}
+          {consultationData && consultationData.payment_details && (
+            <View style={{backgroundColor:'white',padding:20,borderRadius:10,marginBottom:20}}>
+              <Text style={{fontSize:18,fontWeight:'bold',marginBottom:15,color:'#01c43d'}}>भुगतान विवरण</Text>
+              <View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:5}}>
+                <Text style={{fontSize:14,color:'#2D2D2D'}}>वास्तविक राशि:</Text>
+                <Text style={{fontSize:14,color:'#2D2D2D'}}>₹{consultationData.payment_details.actual_amount}</Text>
+              </View>
+              <View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:5}}>
+                <Text style={{fontSize:14,color:'#2D2D2D'}}>छूट:</Text>
+                <Text style={{fontSize:14,color:'#01c43d'}}>₹{consultationData.payment_details.discount}</Text>
+              </View>
+              <View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:5}}>
+                <Text style={{fontSize:14,color:'#2D2D2D'}}>मैप राशि:</Text>
+                <Text style={{fontSize:14,color:'#2D2D2D'}}>₹{consultationData.payment_details.map_amount}</Text>
+              </View>
+              <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+                <Text style={{fontSize:14,color:'#2D2D2D'}}>पिछला बैलेंस:</Text>
+                <Text style={{fontSize:14,color:'#2D2D2D'}}>₹{consultationData.payment_details.prev_balance}</Text>
+              </View>
+            </View>
+          )}
+
+          {/* Logout Button */}
+          <Pressable 
+            style={{backgroundColor:'#dc3545',padding:15,borderRadius:10,alignItems:'center',marginBottom:20}}
+            onPress={handleSignOut}
+          >
+            <Text style={{color:'white',fontSize:16,fontWeight:'bold'}}>लॉग आउट</Text>
+          </Pressable>
         </View>
       </View>
     </ScrollView>
 
     {/* Sticky Footer */}
-    <View style={{ flexDirection: 'row', boxShadow: '0 0 10px rgba(0,0,0,0.1)' }}>
+    <View style={{ flexDirection: 'row', backgroundColor: 'white', elevation: 5 }}>
       <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }}>
-        <FontAwesome6 name="user-gear" size={35} color="#01c43d" style={{ width: 40 }} />
+        <FontAwesome6 name="user-gear" size={30} color="#01c43d" style={{ width: 40 }} />
       </Pressable>
       <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('Dashboard')}>
-        <FontAwesome6 name="music" size={28} color="#10331b" style={{ width: 30 }} />
+        <FontAwesome6 name="music" size={24} color="#10331b" style={{ width: 30 }} />
       </Pressable>
-      <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={handleSignOut}>
-        <MaterialIcons name="logout" size={28} color="#10331b" style={{ width: 30 }} />
+      <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('Medicine')}>
+        <MaterialCommunityIcons name="pill" size={24} color="#10331b" style={{ width: 30 }} />
+      </Pressable>
+      <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('HealthPlan')}>
+        <Ionicons name="fitness" size={24} color="#10331b" style={{ width: 30 }} />
       </Pressable>
     </View>
+
+    {/* Date Selection Modal */}
+    <Portal>
+      <Modal visible={showDateModal} onDismiss={() => setShowDateModal(false)} contentContainerStyle={{backgroundColor:'white',margin:20,padding:20,borderRadius:10}}>
+        <Text style={{fontSize:18,fontWeight:'bold',marginBottom:20,textAlign:'center'}}>परामर्श तिथि चुनें</Text>
+        <ScrollView style={{maxHeight:300}}>
+          {consultationDates.map((date, index) => (
+            <Pressable 
+              key={index}
+              style={{
+                padding:15,
+                borderRadius:5,
+                backgroundColor: selectedDate === date ? '#01c43d' : '#f0f0f0',
+                marginBottom:10
+              }}
+              onPress={() => {
+                getConsultationData(date);
+                setShowDateModal(false);
+              }}
+            >
+              <Text style={{
+                textAlign:'center',
+                color: selectedDate === date ? 'white' : '#2D2D2D',
+                fontWeight:'500'
+              }}>
+                {date}
+              </Text>
+            </Pressable>
+          ))}
+        </ScrollView>
+        <Button onPress={() => setShowDateModal(false)} style={{marginTop:20}}>
+          बंद करें
+        </Button>
+      </Modal>
+    </Portal>
   </View>
   );
 };
