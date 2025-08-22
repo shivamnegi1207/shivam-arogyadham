@@ -120,14 +120,14 @@ const HealthPlanPage = ({ navigation }) => {
         <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('Profile')}>
           <FontAwesome6 name="user-gear" size={24} color="#10331b" style={{ width: 30 }} />
         </Pressable>
-        <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('Dashboard')}>
-          <FontAwesome6 name="music" size={24} color="#10331b" style={{ width: 30 }} />
+        <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }}>
+          <Ionicons name="fitness" size={30} color="#01c43d" style={{ width: 40 }} />
         </Pressable>
         <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('Medicine')}>
           <MaterialCommunityIcons name="pill" size={24} color="#10331b" style={{ width: 30 }} />
         </Pressable>
-        <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }}>
-          <Ionicons name="fitness" size={30} color="#01c43d" style={{ width: 40 }} />
+        <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('Diet')}>
+          <MaterialCommunityIcons name="food-apple" size={24} color="#10331b" style={{ width: 30 }} />
         </Pressable>
       </View>
     </View>

@@ -2,21 +2,18 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-const baseURL = "https://arogyadham.giksindia.com/app/v1/"
-const loginBaseURL = "https://admin.arogyapath.in/api/"
+const baseURL = "https://admin.arogyapath.in/api/"
 
 const axiosAuth = axios.create({
-  baseURL: baseURL, // Replace with your API base URL
+  baseURL: baseURL,
 });
 
 axiosAuth.interceptors.request.use(
   async (config) => {
-    
     let token = await AsyncStorage.getItem('X-ACCESS-TOKEN');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
-
     return config;
   },
   (error) => {
@@ -25,12 +22,8 @@ axiosAuth.interceptors.request.use(
 );
 
 const axiosLocal = axios.create({
-    baseURL: baseURL, // Replace with your API base URL
-  });
-
-const axiosLogin = axios.create({
-    baseURL: loginBaseURL, // For login API only
-  });
+  baseURL: baseURL,
+});
 
 axiosLocal.interceptors.request.use(
   async (config) => {
@@ -54,4 +47,4 @@ axiosLocal.interceptors.response.use(
   }
 );
 
-export { axiosAuth, axiosLocal, axiosLogin, baseURL };
+export { axiosAuth, axiosLocal, baseURL };

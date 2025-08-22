@@ -17,10 +17,9 @@ const LandingPage = ({navigation}) => {
     try {
       const token = await AsyncStorage.getItem('X-ACCESS-TOKEN');
       if (token) {
-        const response = await axiosAuth.get('/user');
-        if (response.data && response.data.data) {
-          const {fullName, role, phoneNumber, registrationNumber} = response.data.data;
-          signin({ token, fullName, role, phoneNumber, registrationNumber });
+        const response = await axiosAuth.get('/getPatientAllConsultationDates');
+        if (response.data && response.data.message === "Data find successfully.") {
+          signin({ token, fullName: 'User', role: 'Patient', phoneNumber: '', registrationNumber: '' });
           setIsLoggedIn(true);
         }
       }
@@ -40,7 +39,7 @@ const LandingPage = ({navigation}) => {
         navigation.dispatch(
                    CommonActions.reset({
                      index: 0,
-                     routes: [{ name: 'Dashboard' }],
+                     routes: [{ name: 'HealthPlan' }],
                    })
                  );
       }

@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { axiosLogin } from "../config/axios";
+import { axiosAuth } from "../config/axios";
 import { Modal, Portal, Button } from "react-native-paper";
 
 const ProfilePage = ({ navigation }) => {
@@ -18,7 +18,7 @@ const ProfilePage = ({ navigation }) => {
 
   const getConsultationDates = async () => {
     try {
-      const response = await axiosLogin.get('/getPatientAllConsultationDates');
+      const response = await axiosAuth.get('/getPatientAllConsultationDates');
       if (response.data && response.data.allDates) {
         setConsultationDates(response.data.allDates);
       }
@@ -30,7 +30,7 @@ const ProfilePage = ({ navigation }) => {
   const getConsultationData = async (date) => {
     setLoading(true);
     try {
-      const response = await axiosLogin.get(`/getPatientDetailByDate/${date}`);
+      const response = await axiosAuth.get(`/getPatientDetailByDate/${date}`);
       if (response.data && response.data.data) {
         setConsultationData(response.data.data);
         setSelectedDate(date);
@@ -68,13 +68,13 @@ const ProfilePage = ({ navigation }) => {
             <View style={{backgroundColor:'white',padding:20,borderRadius:10,marginBottom:20}}>
               <Text style={{fontSize:18,fontWeight:'bold',marginBottom:15,color:'#01c43d'}}>उपयोगकर्ता जानकारी</Text>
               <Text style={{fontSize:16,color:'#2D2D2D',marginBottom:8}}>
-                नाम: {state.fullName || 'N/A'}
+                नाम: {String(state.fullName || 'N/A')}
               </Text>
               <Text style={{fontSize:16,color:'#2D2D2D',marginBottom:8}}>
-                भूमिका: {state.role || 'N/A'}
+                भूमिका: {String(state.role || 'N/A')}
               </Text>
               <Text style={{fontSize:16,color:'#2D2D2D'}}>
-                फोन नंबर: {state.phoneNumber || 'N/A'}
+                फोन नंबर: {String(state.phoneNumber || 'N/A')}
               </Text>
             </View>
 
@@ -105,7 +105,7 @@ const ProfilePage = ({ navigation }) => {
                 onPress={() => setShowDateModal(true)}
               >
                 <Text style={{color:'white',fontWeight:'bold'}}>
-                  {selectedDate ? selectedDate : 'तिथि चुनें'}
+                  {String(selectedDate || 'तिथि चुनें')}
                 </Text>
               </Pressable>
             </View>
@@ -116,19 +116,19 @@ const ProfilePage = ({ navigation }) => {
                 <Text style={{fontSize:18,fontWeight:'bold',marginBottom:15,color:'#01c43d'}}>भुगतान विवरण</Text>
                 <View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:8}}>
                   <Text style={{fontSize:14,color:'#2D2D2D'}}>पिछला बैलेंस:</Text>
-                  <Text style={{fontSize:14,color:'#5F5F5F'}}>₹{consultationData.payment_details.prev_balance || 0}</Text>
+                  <Text style={{fontSize:14,color:'#5F5F5F'}}>₹{String(consultationData.payment_details.prev_balance || 0)}</Text>
                 </View>
                 <View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:8}}>
                   <Text style={{fontSize:14,color:'#2D2D2D'}}>मैप राशि:</Text>
-                  <Text style={{fontSize:14,color:'#5F5F5F'}}>₹{consultationData.payment_details.map_amount || 0}</Text>
+                  <Text style={{fontSize:14,color:'#5F5F5F'}}>₹{String(consultationData.payment_details.map_amount || 0)}</Text>
                 </View>
                 <View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:8}}>
                   <Text style={{fontSize:14,color:'#2D2D2D'}}>वास्तविक राशि:</Text>
-                  <Text style={{fontSize:14,color:'#5F5F5F'}}>₹{consultationData.payment_details.actual_amount || 0}</Text>
+                  <Text style={{fontSize:14,color:'#5F5F5F'}}>₹{String(consultationData.payment_details.actual_amount || 0)}</Text>
                 </View>
                 <View style={{flexDirection:'row',justifyContent:'space-between'}}>
                   <Text style={{fontSize:14,color:'#2D2D2D'}}>छूट:</Text>
-                  <Text style={{fontSize:14,color:'#01c43d'}}>₹{consultationData.payment_details.discount || 0}</Text>
+                  <Text style={{fontSize:14,color:'#01c43d'}}>₹{String(consultationData.payment_details.discount || 0)}</Text>
                 </View>
               </View>
             )}
@@ -157,14 +157,14 @@ const ProfilePage = ({ navigation }) => {
         <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }}>
           <FontAwesome6 name="user-gear" size={30} color="#01c43d" style={{ width: 40 }} />
         </Pressable>
-        <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('Dashboard')}>
-          <FontAwesome6 name="music" size={24} color="#10331b" style={{ width: 30 }} />
+        <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('HealthPlan')}>
+          <Ionicons name="fitness" size={24} color="#10331b" style={{ width: 30 }} />
         </Pressable>
         <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('Medicine')}>
           <MaterialCommunityIcons name="pill" size={24} color="#10331b" style={{ width: 30 }} />
         </Pressable>
-        <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('HealthPlan')}>
-          <Ionicons name="fitness" size={24} color="#10331b" style={{ width: 30 }} />
+        <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('Diet')}>
+          <MaterialCommunityIcons name="food-apple" size={24} color="#10331b" style={{ width: 30 }} />
         </Pressable>
       </View>
 
@@ -192,7 +192,7 @@ const ProfilePage = ({ navigation }) => {
                   color: selectedDate === date ? 'white' : '#2D2D2D',
                   fontWeight:'500'
                 }}>
-                  {date}
+                  {String(date)}
                 </Text>
               </Pressable>
             ))}

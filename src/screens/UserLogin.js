@@ -5,7 +5,7 @@ import { Dialog, Portal, TextInput } from "react-native-paper";
 import { CommonActions } from "@react-navigation/native";
 import { useForm } from "react-hook-form";
 import { useContext, useEffect, useState } from "react";
-import { axiosLogin } from "../config/axios";
+import { axiosLocal } from "../config/axios";
 import { Context as AuthContext } from '../context/AuthContext';
 
 const UserLoginPage = ({navigation}) => {
@@ -43,7 +43,7 @@ const UserLoginPage = ({navigation}) => {
         clearErrors();
         setLoading(true);
         try{
-          const response = await axiosLogin.post('/login', {userName:data.userName, password:data.password});
+          const response = await axiosLocal.post('/login', {userName:data.userName, password:data.password});
           if(response.data && response.data.token){
             const {token, userName, role, message} = response.data;
             // Store the token and user data
@@ -54,7 +54,7 @@ const UserLoginPage = ({navigation}) => {
               navigation.dispatch(
                 CommonActions.reset({
                   index: 0,
-                  routes: [{ name: 'Dashboard' }],
+                  routes: [{ name: 'HealthPlan' }],
                 })
               );
             } else {

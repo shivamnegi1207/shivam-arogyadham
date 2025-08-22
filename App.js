@@ -8,8 +8,6 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { Provider as AuthProvider } from './src/context/AuthContext';
-// import InitialPage from './src/screens/initialScreen';
-import DashboardPage from './src/screens/dashboard';
 import ProfilePage from './src/screens/profile';
 import MedicinePage from './src/screens/medicine';
 import ExercisePage from './src/screens/exercise';
@@ -55,7 +53,6 @@ export default function App() {
     <PaperProvider theme={theme}>
     <NavigationContainer >
       <Stack.Navigator backBehavior="order" screenOptions={{animation:"slide_from_right"}} >
-        {/* <Stack.Screen name="InitialPage" component={InitialPage} options={{headerShown:false}}/> */}
         <Stack.Screen name="LandingPage" component={LandingPage} options={{headerShown:false}}/>
         <Stack.Screen name="UserLogin" 
           component={UserLoginPage} 
@@ -81,13 +78,12 @@ export default function App() {
             :null
           })} 
         />
-        <Stack.Screen name="Dashboard" component={DashboardPage} options={{headerShown:false}}/>
+        <Stack.Screen name="HealthPlan" component={HealthPlanPage} options={{headerShown:false}}/>
         <Stack.Screen name="Profile" component={ProfilePage} options={{headerShown:false}}/>
         <Stack.Screen name="Medicine" component={MedicinePage} options={{headerShown:false}}/>
         <Stack.Screen name="Exercise" component={ExercisePage} options={{headerShown:false}}/>
         <Stack.Screen name="Diet" component={DietPage} options={{headerShown:false}}/>
         <Stack.Screen name="TimeTable" component={TimeTablePage} options={{headerShown:false}}/>
-        <Stack.Screen name="HealthPlan" component={HealthPlanPage} options={{headerShown:false}}/>
       </Stack.Navigator>
     </NavigationContainer>
     </PaperProvider>

@@ -5,7 +5,7 @@ import { useContext, useEffect, useState } from "react";
 import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import Ionicons from '@expo/vector-icons/Ionicons';
-import { axiosLogin } from "../config/axios";
+import { axiosAuth } from "../config/axios";
 import { Modal, Portal, Button } from "react-native-paper";
 
 const ExercisePage = ({ navigation }) => {
@@ -18,7 +18,7 @@ const ExercisePage = ({ navigation }) => {
 
   const getConsultationDates = async () => {
     try {
-      const response = await axiosLogin.get('/getPatientAllConsultationDates');
+      const response = await axiosAuth.get('/getPatientAllConsultationDates');
       if (response.data && response.data.allDates) {
         setConsultationDates(response.data.allDates);
       }
@@ -30,7 +30,7 @@ const ExercisePage = ({ navigation }) => {
   const getConsultationData = async (date) => {
     setLoading(true);
     try {
-      const response = await axiosLogin.get(`/getPatientDetailByDate/${date}`);
+      const response = await axiosAuth.get(`/getPatientDetailByDate/${date}`);
       if (response.data && response.data.data) {
         setConsultationData(response.data.data);
         setSelectedDate(date);
@@ -68,7 +68,7 @@ const ExercisePage = ({ navigation }) => {
                 onPress={() => setShowDateModal(true)}
               >
                 <Text style={{color:'white',fontWeight:'bold'}}>
-                  {selectedDate ? selectedDate : 'तिथि चुनें'}
+                  {String(selectedDate || 'तिथि चुनें')}
                 </Text>
               </Pressable>
             </View>
@@ -135,14 +135,14 @@ const ExercisePage = ({ navigation }) => {
         <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('Profile')}>
           <FontAwesome6 name="user-gear" size={24} color="#10331b" style={{ width: 30 }} />
         </Pressable>
-        <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('Dashboard')}>
-          <FontAwesome6 name="music" size={24} color="#10331b" style={{ width: 30 }} />
+        <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('HealthPlan')}>
+          <Ionicons name="fitness" size={24} color="#10331b" style={{ width: 30 }} />
         </Pressable>
         <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('Medicine')}>
           <MaterialCommunityIcons name="pill" size={24} color="#10331b" style={{ width: 30 }} />
         </Pressable>
-        <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('HealthPlan')}>
-          <Ionicons name="fitness" size={24} color="#10331b" style={{ width: 30 }} />
+        <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('Diet')}>
+          <MaterialCommunityIcons name="food-apple" size={24} color="#10331b" style={{ width: 30 }} />
         </Pressable>
       </View>
 
@@ -170,7 +170,7 @@ const ExercisePage = ({ navigation }) => {
                   color: selectedDate === date ? 'white' : '#2D2D2D',
                   fontWeight:'500'
                 }}>
-                  {date}
+                  {String(date)}
                 </Text>
               </Pressable>
             ))}
