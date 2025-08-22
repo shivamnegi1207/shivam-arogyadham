@@ -8,6 +8,7 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { useEffect } from 'react';
 import { Provider as AuthProvider } from './src/context/AuthContext';
+import { Provider as LanguageProvider } from './src/context/LanguageContext';
 import ProfilePage from './src/screens/profile';
 import MedicinePage from './src/screens/medicine';
 import ExercisePage from './src/screens/exercise';
@@ -49,6 +50,7 @@ export default function App() {
   };
 
   return (
+    <LanguageProvider>
     <AuthProvider>
     <PaperProvider theme={theme}>
     <NavigationContainer >
@@ -88,5 +90,6 @@ export default function App() {
     </NavigationContainer>
     </PaperProvider>
     </AuthProvider>
+    </LanguageProvider>
   );
 }
