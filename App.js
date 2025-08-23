@@ -15,6 +15,7 @@ import ExercisePage from './src/screens/exercise';
 import DietPage from './src/screens/diet';
 import TimeTablePage from './src/screens/timeTable';
 import HealthPlanPage from './src/screens/healthPlan';
+import InitialPage from './src/screens/initialScreen';
 
 const Stack = createNativeStackNavigator();
 
@@ -55,6 +56,7 @@ export default function App() {
     <PaperProvider theme={theme}>
     <NavigationContainer >
       <Stack.Navigator backBehavior="order" screenOptions={{animation:"slide_from_right"}} >
+        <Stack.Screen name="InitialPage" component={InitialPage} options={{headerShown:false}}/>
         <Stack.Screen name="LandingPage" component={LandingPage} options={{headerShown:false}}/>
         <Stack.Screen name="UserLogin" 
           component={UserLoginPage} 
