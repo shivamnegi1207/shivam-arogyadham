@@ -104,7 +104,7 @@ const TimeTablePage = ({ navigation }) => {
                         </Text>
                         {schedule.medicines.map((medicine, medIndex) => (
                           <Text key={medIndex} style={{fontSize:13,color:'#5F5F5F',marginLeft:10}}>
-                            • {String(medicine.label || medicine.value || 'दवा')}
+                            • {String(medicine)}
                           </Text>
                         ))}
                       </View>
