@@ -2,7 +2,7 @@ import { Image, ScrollView, Text, View } from "react-native";
 import { InitialStyle } from "../styles/initial";
 import CommonButton from "../components/commonBtn";
 import { useEffect, useState } from "react";
-import axios from "../config/axios";
+import { axiosAuth } from "../config/axios";
 import { CommonActions } from "@react-navigation/native";
 
 const InitialPage = ({navigation}) => {
