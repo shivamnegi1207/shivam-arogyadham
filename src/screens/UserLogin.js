@@ -32,7 +32,7 @@ const UserLogin = ({ navigation }) => {
     setLoading(true);
     try {
       const response = await axios.post('/login', {
-        phone: phoneNumber,
+        userName: phoneNumber,
         password: password,
       });
 

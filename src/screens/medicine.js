@@ -80,17 +80,31 @@ const MedicinePage = ({ navigation }) => {
                 {consultationData.prescribedMedicine.map((medicine, index) => (
                   <View key={index} style={{marginBottom:15,padding:15,backgroundColor:'#f8f9fa',borderRadius:8}}>
                     <Text style={{fontSize:16,fontWeight:'bold',color:'#2D2D2D',marginBottom:5}}>
-                      {String(medicine.medicine_name || 'दवा का नाम')}
+                      {String(medicine.medicine_hi_name || medicine.medicine_name || 'दवा का नाम')}
                     </Text>
                     <Text style={{fontSize:14,color:'#5F5F5F',marginBottom:3}}>
-                      खुराक: {String(medicine.dosage || 'N/A')}
+                      मात्रा: {String(medicine.quantity || 'N/A')}
                     </Text>
                     <Text style={{fontSize:14,color:'#5F5F5F',marginBottom:3}}>
-                      आवृत्ति: {String(medicine.frequency || 'N/A')}
+                      खरीदें: {String(medicine.buy_from || 'N/A')}
                     </Text>
-                    <Text style={{fontSize:14,color:'#5F5F5F'}}>
-                      अवधि: {String(medicine.duration || 'N/A')}
-                    </Text>
+                    {medicine.how_to_take && medicine.how_to_take.length > 0 && (
+                      <View style={{marginTop:10}}>
+                        <Text style={{fontSize:14,fontWeight:'500',color:'#01c43d',marginBottom:5}}>
+                          सेवन विधि:
+                        </Text>
+                        {medicine.how_to_take.map((instruction, instIndex) => (
+                          <View key={instIndex} style={{marginBottom:8,paddingLeft:10}}>
+                            <Text style={{fontSize:13,color:'#2D2D2D',fontWeight:'500'}}>
+                              {String(instruction.hi_time_of_take || instruction.time_of_take || '')}
+                            </Text>
+                            <Text style={{fontSize:12,color:'#5F5F5F',marginTop:2}}>
+                              {String(instruction.hi_way_of_taken || instruction.way_of_taken || '')}
+                            </Text>
+                          </View>
+                        ))}
+                      </View>
+                    )}
                   </View>
                 ))}
               </View>

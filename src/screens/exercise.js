@@ -82,15 +82,14 @@ const ExercisePage = ({ navigation }) => {
                     <Text style={{fontSize:16,fontWeight:'bold',color:'#2D2D2D',marginBottom:5}}>
                       {String(exercise.exercise_hi_name || exercise.exercise_name || 'व्यायाम')}
                     </Text>
-                    <Text style={{fontSize:14,color:'#5F5F5F',marginBottom:3}}>
-                      अवधि: {String(exercise.duration || 'N/A')} मिनट
-                    </Text>
-                    <Text style={{fontSize:14,color:'#5F5F5F',marginBottom:3}}>
-                      दोहराव: {String(exercise.repetitions || 'N/A')}
-                    </Text>
-                    {exercise.description && (
+                    {exercise.hi_how_to_do && (
                       <Text style={{fontSize:13,color:'#5F5F5F',marginTop:5,lineHeight:18}}>
-                        विवरण: {String(exercise.description)}
+                        कैसे करें: {String(exercise.hi_how_to_do)}
+                      </Text>
+                    )}
+                    {exercise.how_to_do && !exercise.hi_how_to_do && (
+                      <Text style={{fontSize:13,color:'#5F5F5F',marginTop:5,lineHeight:18}}>
+                        How to do: {String(exercise.how_to_do)}
                       </Text>
                     )}
                   </View>
