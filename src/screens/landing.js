@@ -2,7 +2,7 @@ import { Image, ScrollView, Text } from "react-native";
 import { LandingStyle } from "../styles/landing";
 import CommonButton from "../components/commonBtn";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { axiosAuth } from "../config/axios";
+import axios from "../config/axios";
 import { useContext, useEffect, useState } from "react";
 import { Context as AuthContext } from '../context/AuthContext';
 import { CommonActions } from "@react-navigation/native";
@@ -17,7 +17,7 @@ const LandingPage = ({navigation}) => {
     try {
       const token = await AsyncStorage.getItem('X-ACCESS-TOKEN');
       if (token) {
-        const response = await axiosAuth.get('/getPatientAllConsultationDates');
+        const response = await axios.get('/getPatientAllConsultationDates');
         if (response.data && response.data.message === "Data find successfully.") {
           signin({ token, fullName: 'User', role: 'Patient', phoneNumber: '', registrationNumber: '' });
           setIsLoggedIn(true);
