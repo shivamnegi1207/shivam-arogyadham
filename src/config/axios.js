@@ -1,26 +1,18 @@
-import axios from 'axios';
+// axiosInstance.js
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
-const loginBaseURL = "https://admin.arogyapath.in/api/";
+const baseURL = "https://admin.arogyapath.in/api/"
 
-const axiosInstance = axios.create({
-  baseURL: loginBaseURL,
-  timeout: 10000,
-  headers: {
-    'Content-Type': 'application/json',
-  },
+const axiosAuth = axios.create({
+  baseURL: baseURL,
 });
 
-// Request interceptor to add token
-axiosInstance.interceptors.request.use(
+axiosAuth.interceptors.request.use(
   async (config) => {
-    try {
-      const token = await AsyncStorage.getItem('userToken');
-      if (token) {
-        config.headers.Authorization = `Bearer ${token}`;
-      }
-    } catch (error) {
-      console.error('Error getting token:', error);
+    let token = await AsyncStorage.getItem('X-ACCESS-TOKEN');
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
     }
     return config;
   },
@@ -29,17 +21,30 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// Response interceptor for error handling
-axiosInstance.interceptors.response.use(
-  (response) => response,
+const axiosLocal = axios.create({
+  baseURL: baseURL,
+});
+
+axiosLocal.interceptors.request.use(
+  async (config) => {
+    console.log('Request:', config);
+    return config;
+  },
   (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid
-      AsyncStorage.removeItem('userToken');
-      AsyncStorage.removeItem('userData');
-    }
+    console.log('Request Error:', error);
     return Promise.reject(error);
   }
 );
 
-export default axiosInstance;
+axiosLocal.interceptors.response.use(
+  (response) => {
+    console.log('Response:', response);
+    return response;
+  },
+  (error) => {
+    console.log('Response Error:', error);
+    return Promise.reject(error);
+  }
+);
+
+export { axiosAuth, axiosLocal, baseURL };

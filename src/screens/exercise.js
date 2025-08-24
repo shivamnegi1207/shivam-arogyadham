@@ -18,7 +18,7 @@ const ExercisePage = ({ navigation }) => {
 
   const getConsultationDates = async () => {
     try {
-      const response = await axios.get('/getPatientAllConsultationDates');
+      const response = await axiosAuth.get('/getPatientAllConsultationDates');
       if (response.data && response.data.allDates) {
         setConsultationDates(response.data.allDates);
       }
@@ -30,7 +30,7 @@ const ExercisePage = ({ navigation }) => {
   const getConsultationData = async (date) => {
     setLoading(true);
     try {
-      const response = await axios.get(`/getPatientDetailByDate/${date}`);
+      const response = await axiosAuth.get(`/getPatientDetailByDate/${date}`);
       if (response.data && response.data.data) {
         setConsultationData(response.data.data);
         setSelectedDate(date);

@@ -1,490 +1,281 @@
-import React, { useState, useContext, useEffect } from 'react';
-import {
-  View,
-  Text,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Modal,
-  FlatList,
-  Alert,
-  ActivityIndicator,
-} from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AuthContext } from '../context/AuthContext';
-import { LanguageContext } from '../context/LanguageContext';
-import { translations } from '../utils/translations';
-import axios from '../config/axios';
+import { Image, Pressable, ScrollView, Text, View } from "react-native";
+import { DashboardStyle } from "../styles/dashboard";
+import { Context as AuthContext } from '../context/AuthContext';
+import { Context as LanguageContext } from '../context/LanguageContext';
+import { useContext, useEffect, useState } from "react";
+import FontAwesome6 from '@expo/vector-icons/FontAwesome6';
+import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
+import Ionicons from '@expo/vector-icons/Ionicons';
+import { axiosAuth } from "../config/axios";
+import { Modal, Portal, Button } from "react-native-paper";
+import { getTranslation } from "../utils/translations";
 
-const Profile = ({ navigation }) => {
-  const { user, logout } = useContext(AuthContext);
-  const { language, toggleLanguage } = useContext(LanguageContext);
-  const t = translations[language];
-  
+const ProfilePage = ({ navigation }) => {
+  const { state, logout } = useContext(AuthContext);
+  const { state: langState, setLanguage, loadLanguage } = useContext(LanguageContext);
+  const [consultationDates, setConsultationDates] = useState([]);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const [consultationData, setConsultationData] = useState(null);
   const [showDateModal, setShowDateModal] = useState(false);
   const [showLanguageModal, setShowLanguageModal] = useState(false);
-  const [consultationDates, setConsultationDates] = useState([]);
-  const [selectedDateData, setSelectedDateData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [datesLoading, setDatesLoading] = useState(false);
 
-  const fetchConsultationDates = async () => {
-    setDatesLoading(true);
+  const getConsultationDates = async () => {
     try {
-      const response = await axios.get('/getPatientAllConsultationDates');
+      const response = await axiosAuth.get('/getPatientAllConsultationDates');
       if (response.data && response.data.allDates) {
         setConsultationDates(response.data.allDates);
       }
     } catch (error) {
-      console.error('Error fetching dates:', error);
-      Alert.alert(t.error, t.failedToLoadDates);
-    } finally {
-      setDatesLoading(false);
+      console.warn(error.message || "Error fetching consultation dates");
     }
   };
 
-  const fetchDateDetails = async (date) => {
+  const getConsultationData = async (date) => {
     setLoading(true);
     try {
-      const response = await axios.get(`/getPatientDetailByDate/${date}`);
+      const response = await axiosAuth.get(`/getPatientDetailByDate/${date}`);
       if (response.data && response.data.data) {
-        setSelectedDateData(response.data.data);
+        setConsultationData(response.data.data);
+        setSelectedDate(date);
       }
     } catch (error) {
-      console.error('Error fetching date details:', error);
-      Alert.alert(t.error, t.failedToLoadDetails);
+      console.warn(error.message || "Error fetching consultation data");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleDateSelect = (date) => {
-    fetchDateDetails(date);
-    setShowDateModal(false);
-  };
+  useEffect(() => {
+    getConsultationDates();
+    loadLanguage();
+  }, []);
 
-  const handleLogout = () => {
-    Alert.alert(
-      t.logout,
-      t.logoutConfirmation,
-      [
-        { text: t.cancel, style: 'cancel' },
-        { 
-          text: t.logout, 
-          style: 'destructive',
-          onPress: () => {
-            logout();
-            navigation.navigate('Landing');
-          }
-        }
-      ]
-    );
-  };
+  const handleSignOut = () => {
+    logout(navigation);
+  }
 
-  const handleLanguageChange = (newLanguage) => {
-    toggleLanguage();
+  const handleLanguageChange = (language) => {
+    setLanguage(language);
     setShowLanguageModal(false);
-  };
+  }
 
-  const renderDateItem = ({ item }) => (
-    <TouchableOpacity
-      style={styles.dateItem}
-      onPress={() => handleDateSelect(item)}
-    >
-      <Text style={styles.dateText}>{String(item)}</Text>
-    </TouchableOpacity>
-  );
+  const t = (key) => getTranslation(langState.language, key);
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>{t.profile}</Text>
-      </View>
+    <View style={{ flex: 1 }}>
+      <ScrollView contentContainerStyle={{ flexGrow: 1 }}>
+        <View style={DashboardStyle.wrapper}>
+          <View style={{ paddingHorizontal: 30, paddingTop: 65 }}>
+            <Image
+              source={require('../../assets/images/logo.png')}
+              resizeMode="contain"
+              style={DashboardStyle.logo}
+            />
+            <Text style={DashboardStyle.subHeading}>
+              {t('profile')}
+            </Text>
 
-      {/* User Information */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t.userInformation}</Text>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>{t.name}:</Text>
-          <Text style={styles.infoValue}>{String(user?.name || t.notAvailable)}</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>{t.phoneNumber}:</Text>
-          <Text style={styles.infoValue}>{String(user?.phone || t.notAvailable)}</Text>
-        </View>
-        <View style={styles.infoRow}>
-          <Text style={styles.infoLabel}>{t.email}:</Text>
-          <Text style={styles.infoValue}>{String(user?.email || t.notAvailable)}</Text>
-        </View>
-      </View>
-
-      {/* Contact Information */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t.contactInformation}</Text>
-        <View style={styles.contactInfo}>
-          <Text style={styles.contactLabel}>{t.address}:</Text>
-          <Text style={styles.contactValue}>
-            Jadi Buti Farms, Kolhupani, Uttarakhand 248007
-          </Text>
-        </View>
-        <View style={styles.contactInfo}>
-          <Text style={styles.contactLabel}>{t.email}:</Text>
-          <Text style={styles.contactValue}>info@arogyapath.org</Text>
-        </View>
-        <View style={styles.contactInfo}>
-          <Text style={styles.contactLabel}>{t.timing}:</Text>
-          <Text style={styles.contactValue}>
-            {language === 'hindi' ? 'सोमवार से रविवार : सुबह 9 बजे से शाम 4 बजे तक' : 'Monday to Sunday : 9am to 4pm'}
-          </Text>
-        </View>
-      </View>
-
-      {/* Language Settings */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t.languageSettings}</Text>
-        <TouchableOpacity
-          style={styles.languageButton}
-          onPress={() => setShowLanguageModal(true)}
-        >
-          <Text style={styles.languageButtonText}>
-            {t.currentLanguage}: {language === 'hindi' ? 'हिंदी' : 'English'}
-          </Text>
-          <Text style={styles.changeText}>{t.changeLanguage}</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Consultation History */}
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>{t.consultationHistory}</Text>
-        <TouchableOpacity
-          style={styles.historyButton}
-          onPress={() => {
-            setShowDateModal(true);
-            fetchConsultationDates();
-          }}
-        >
-          <Text style={styles.historyButtonText}>{t.viewConsultationHistory}</Text>
-        </TouchableOpacity>
-      </View>
-
-      {/* Payment Details */}
-      {selectedDateData?.payment_details && (
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>{t.paymentDetails}</Text>
-          <View style={styles.paymentCard}>
-            <View style={styles.paymentRow}>
-              <Text style={styles.paymentLabel}>{t.actualAmount}:</Text>
-              <Text style={styles.paymentValue}>₹{String(selectedDateData.payment_details.actual_amount || 0)}</Text>
+            {/* User Information */}
+            <View style={{backgroundColor:'white',padding:20,borderRadius:10,marginBottom:20}}>
+              <Text style={{fontSize:18,fontWeight:'bold',marginBottom:15,color:'#01c43d'}}>{t('userInfo')}</Text>
+              <Text style={{fontSize:16,color:'#2D2D2D',marginBottom:8}}>
+                {t('name')}: {String(state.fullName || 'N/A')}
+              </Text>
+              <Text style={{fontSize:16,color:'#2D2D2D',marginBottom:8}}>
+                {t('role')}: {String(state.role || 'N/A')}
+              </Text>
+              <Text style={{fontSize:16,color:'#2D2D2D'}}>
+                {t('phoneNumber')}: {String(state.phoneNumber || 'N/A')}
+              </Text>
             </View>
-            <View style={styles.paymentRow}>
-              <Text style={styles.paymentLabel}>{t.discount}:</Text>
-              <Text style={styles.paymentValue}>₹{String(selectedDateData.payment_details.discount || 0)}</Text>
+
+            {/* Contact Information */}
+            <View style={{backgroundColor:'white',padding:20,borderRadius:10,marginBottom:20}}>
+              <Text style={{fontSize:18,fontWeight:'bold',marginBottom:15,color:'#01c43d'}}>{t('contactInfo')}</Text>
+              <Text style={{fontSize:14,color:'#2D2D2D',marginBottom:8,fontWeight:'500'}}>{t('address')}:</Text>
+              <Text style={{fontSize:14,color:'#5F5F5F',marginBottom:12,lineHeight:20}}>
+                Jadi Buti Farms, Kolhupani, Uttarakhand 248007
+              </Text>
+              
+              <Text style={{fontSize:14,color:'#2D2D2D',marginBottom:8,fontWeight:'500'}}>{t('email')}:</Text>
+              <Text style={{fontSize:14,color:'#5F5F5F',marginBottom:12}}>
+                info@arogyapath.org
+              </Text>
+              
+              <Text style={{fontSize:14,color:'#2D2D2D',marginBottom:8,fontWeight:'500'}}>{t('timing')}:</Text>
+              <Text style={{fontSize:14,color:'#5F5F5F'}}>
+                {langState.language === 'hindi' ? 'सोमवार से रविवार: सुबह 9 बजे से शाम 4 बजे तक' : 'Monday to Sunday: 9am to 4pm'}
+              </Text>
             </View>
-            <View style={styles.paymentRow}>
-              <Text style={styles.paymentLabel}>{t.mapAmount}:</Text>
-              <Text style={styles.paymentValue}>₹{String(selectedDateData.payment_details.map_amount || 0)}</Text>
+
+            {/* Language Settings */}
+            <View style={{backgroundColor:'white',padding:20,borderRadius:10,marginBottom:20}}>
+              <Text style={{fontSize:18,fontWeight:'bold',marginBottom:15,color:'#01c43d'}}>{t('languageSettings')}</Text>
+              <Pressable 
+                style={{backgroundColor:'#01c43d',padding:15,borderRadius:8,alignItems:'center'}}
+                onPress={() => setShowLanguageModal(true)}
+              >
+                <Text style={{color:'white',fontWeight:'bold',fontSize:16}}>
+                  {t('selectLanguage')}: {t(langState.language)}
+                </Text>
+              </Pressable>
             </View>
-            <View style={styles.paymentRow}>
-              <Text style={styles.paymentLabel}>{t.previousBalance}:</Text>
-              <Text style={styles.paymentValue}>₹{String(selectedDateData.payment_details.prev_balance || 0)}</Text>
+
+            {/* Date Selection for Consultation History */}
+            <View style={{backgroundColor:'white',padding:20,borderRadius:10,marginBottom:20}}>
+              <Text style={{fontSize:18,fontWeight:'bold',marginBottom:15,color:'#01c43d'}}>{t('consultationHistory')}</Text>
+              <Pressable 
+                style={{backgroundColor:'#01c43d',padding:10,borderRadius:5,alignItems:'center'}}
+                onPress={() => setShowDateModal(true)}
+              >
+                <Text style={{color:'white',fontWeight:'bold'}}>
+                  {String(selectedDate || t('selectDate'))}
+                </Text>
+              </Pressable>
             </View>
+
+            {/* Payment Details */}
+            {consultationData && consultationData.payment_details && (
+              <View style={{backgroundColor:'white',padding:20,borderRadius:10,marginBottom:20}}>
+                <Text style={{fontSize:18,fontWeight:'bold',marginBottom:15,color:'#01c43d'}}>{t('paymentDetails')}</Text>
+                <View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:8}}>
+                  <Text style={{fontSize:14,color:'#2D2D2D'}}>{t('previousBalance')}:</Text>
+                  <Text style={{fontSize:14,color:'#5F5F5F'}}>₹{String(consultationData.payment_details.prev_balance || 0)}</Text>
+                </View>
+                <View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:8}}>
+                  <Text style={{fontSize:14,color:'#2D2D2D'}}>{t('mapAmount')}:</Text>
+                  <Text style={{fontSize:14,color:'#5F5F5F'}}>₹{String(consultationData.payment_details.map_amount || 0)}</Text>
+                </View>
+                <View style={{flexDirection:'row',justifyContent:'space-between',marginBottom:8}}>
+                  <Text style={{fontSize:14,color:'#2D2D2D'}}>{t('actualAmount')}:</Text>
+                  <Text style={{fontSize:14,color:'#5F5F5F'}}>₹{String(consultationData.payment_details.actual_amount || 0)}</Text>
+                </View>
+                <View style={{flexDirection:'row',justifyContent:'space-between'}}>
+                  <Text style={{fontSize:14,color:'#2D2D2D'}}>{t('discount')}:</Text>
+                  <Text style={{fontSize:14,color:'#01c43d'}}>₹{String(consultationData.payment_details.discount || 0)}</Text>
+                </View>
+              </View>
+            )}
+
+            {/* Logout Button */}
+            <Pressable 
+              style={{
+                backgroundColor:'#dc3545',
+                padding:15,
+                borderRadius:10,
+                alignItems:'center',
+                marginBottom:20
+              }}
+              onPress={handleSignOut}
+            >
+              <Text style={{color:'white',fontSize:16,fontWeight:'bold'}}>
+                {t('logout')}
+              </Text>
+            </Pressable>
           </View>
         </View>
-      )}
+      </ScrollView>
 
-      {/* Logout Button */}
-      <View style={styles.section}>
-        <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-          <Text style={styles.logoutButtonText}>{t.logout}</Text>
-        </TouchableOpacity>
+      {/* Sticky Footer */}
+      <View style={{ flexDirection: 'row', backgroundColor: 'white', elevation: 5 }}>
+        <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }}>
+          <FontAwesome6 name="user-gear" size={30} color="#01c43d" style={{ width: 40 }} />
+        </Pressable>
+        <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('HealthPlan')}>
+          <Ionicons name="fitness" size={24} color="#10331b" style={{ width: 30 }} />
+        </Pressable>
+        <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('Medicine')}>
+          <MaterialCommunityIcons name="pill" size={24} color="#10331b" style={{ width: 30 }} />
+        </Pressable>
+        <Pressable style={{ flex: 1, alignItems: 'center', padding: 10 }} onPress={()=>navigation.navigate('Diet')}>
+          <MaterialCommunityIcons name="food-apple" size={24} color="#10331b" style={{ width: 30 }} />
+        </Pressable>
       </View>
 
       {/* Date Selection Modal */}
-      <Modal
-        visible={showDateModal}
-        animationType="slide"
-        transparent={true}
-        onRequestClose={() => setShowDateModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.modalContent}>
-            <Text style={styles.modalTitle}>{t.selectConsultationDate}</Text>
-            
-            {datesLoading ? (
-              <ActivityIndicator size="large" color="#4CAF50" style={styles.loader} />
-            ) : (
-              <FlatList
-                data={consultationDates}
-                keyExtractor={(item) => String(item)}
-                renderItem={renderDateItem}
-                style={styles.datesList}
-              />
-            )}
-            
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setShowDateModal(false)}
-            >
-              <Text style={styles.closeButtonText}>{t.close}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-      {/* Language Selection Modal */}
-      <Modal
-        visible={showLanguageModal}
-        animationType="fade"
-        transparent={true}
-        onRequestClose={() => setShowLanguageModal(false)}
-      >
-        <View style={styles.modalOverlay}>
-          <View style={styles.languageModalContent}>
-            <Text style={styles.modalTitle}>{t.selectLanguage}</Text>
-            
-            <TouchableOpacity
-              style={[styles.languageOption, language === 'english' && styles.selectedLanguage]}
-              onPress={() => handleLanguageChange('english')}
-            >
-              <Text style={[styles.languageOptionText, language === 'english' && styles.selectedLanguageText]}>
-                English
-              </Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={[styles.languageOption, language === 'hindi' && styles.selectedLanguage]}
-              onPress={() => handleLanguageChange('hindi')}
-            >
-              <Text style={[styles.languageOptionText, language === 'hindi' && styles.selectedLanguageText]}>
-                हिंदी
-              </Text>
-            </TouchableOpacity>
-            
-            <TouchableOpacity
-              style={styles.closeButton}
-              onPress={() => setShowLanguageModal(false)}
-            >
-              <Text style={styles.closeButtonText}>{t.cancel}</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-      {loading && (
-        <View style={styles.loadingOverlay}>
-          <ActivityIndicator size="large" color="#4CAF50" />
-        </View>
-      )}
-    </ScrollView>
+      <Portal>
+        <Modal visible={showDateModal} onDismiss={() => setShowDateModal(false)} contentContainerStyle={{backgroundColor:'white',margin:20,padding:20,borderRadius:10}}>
+          <Text style={{fontSize:18,fontWeight:'bold',marginBottom:20,textAlign:'center'}}>{t('selectConsultationDate')}</Text>
+          <ScrollView style={{maxHeight:300}}>
+            {consultationDates.map((date, index) => (
+              <Pressable 
+                key={index}
+                style={{
+                  padding:15,
+                  borderRadius:5,
+                  backgroundColor: selectedDate === date ? '#01c43d' : '#f0f0f0',
+                  marginBottom:10
+                }}
+                onPress={() => {
+                  getConsultationData(date);
+                  setShowDateModal(false);
+                }}
+              >
+                <Text style={{
+                  textAlign:'center',
+                  color: selectedDate === date ? 'white' : '#2D2D2D',
+                  fontWeight:'500'
+                }}>
+                  {String(date)}
+                </Text>
+              </Pressable>
+            ))}
+          </ScrollView>
+          <Button onPress={() => setShowDateModal(false)} style={{marginTop:20}}>
+            {t('close')}
+          </Button>
+        </Modal>
+        
+        {/* Language Selection Modal */}
+        <Modal visible={showLanguageModal} onDismiss={() => setShowLanguageModal(false)} contentContainerStyle={{backgroundColor:'white',margin:20,padding:20,borderRadius:10}}>
+          <Text style={{fontSize:18,fontWeight:'bold',marginBottom:20,textAlign:'center'}}>{t('selectLanguage')}</Text>
+          
+          <Pressable 
+            style={{
+              padding:15,
+              borderRadius:8,
+              backgroundColor: langState.language === 'hindi' ? '#01c43d' : '#f0f0f0',
+              marginBottom:10
+            }}
+            onPress={() => handleLanguageChange('hindi')}
+          >
+            <Text style={{
+              textAlign:'center',
+              color: langState.language === 'hindi' ? 'white' : '#2D2D2D',
+              fontWeight:'500',
+              fontSize:16
+            }}>
+              हिंदी
+            </Text>
+          </Pressable>
+          
+          <Pressable 
+            style={{
+              padding:15,
+              borderRadius:8,
+              backgroundColor: langState.language === 'english' ? '#01c43d' : '#f0f0f0',
+              marginBottom:20
+            }}
+            onPress={() => handleLanguageChange('english')}
+          >
+            <Text style={{
+              textAlign:'center',
+              color: langState.language === 'english' ? 'white' : '#2D2D2D',
+              fontWeight:'500',
+              fontSize:16
+            }}>
+              English
+            </Text>
+          </Pressable>
+          
+          <Button onPress={() => setShowLanguageModal(false)}>
+            {t('close')}
+          </Button>
+        </Modal>
+      </Portal>
+    </View>
   );
 };
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f5f5f5',
-  },
-  content: {
-    padding: 20,
-  },
-  header: {
-    backgroundColor: '#4CAF50',
-    padding: 20,
-    paddingTop: 50,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#fff',
-    textAlign: 'center',
-  },
-  section: {
-    backgroundColor: '#fff',
-    marginVertical: 10,
-    padding: 20,
-    borderRadius: 10,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#333',
-    marginBottom: 15,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  infoLabel: {
-    fontSize: 16,
-    color: '#666',
-    fontWeight: '500',
-  },
-  infoValue: {
-    fontSize: 16,
-    color: '#333',
-    fontWeight: '600',
-  },
-  contactInfo: {
-    marginBottom: 15,
-  },
-  contactLabel: {
-    fontSize: 14,
-    color: '#666',
-    fontWeight: '500',
-    marginBottom: 5,
-  },
-  contactValue: {
-    fontSize: 16,
-    color: '#333',
-    fontWeight: '600',
-  },
-  languageButton: {
-    backgroundColor: '#f0f0f0',
-    padding: 15,
-    borderRadius: 8,
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  languageButtonText: {
-    fontSize: 16,
-    color: '#333',
-    fontWeight: '600',
-  },
-  changeText: {
-    fontSize: 14,
-    color: '#4CAF50',
-    fontWeight: '500',
-  },
-  historyButton: {
-    backgroundColor: '#4CAF50',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  historyButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  paymentCard: {
-    backgroundColor: '#f9f9f9',
-    padding: 15,
-    borderRadius: 8,
-  },
-  paymentRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  paymentLabel: {
-    fontSize: 16,
-    color: '#666',
-  },
-  paymentValue: {
-    fontSize: 16,
-    color: '#333',
-    fontWeight: 'bold',
-  },
-  logoutButton: {
-    backgroundColor: '#f44336',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-  },
-  logoutButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    backgroundColor: '#fff',
-    width: '80%',
-    maxHeight: '70%',
-    borderRadius: 10,
-    padding: 20,
-  },
-  languageModalContent: {
-    backgroundColor: '#fff',
-    width: '80%',
-    borderRadius: 10,
-    padding: 20,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginBottom: 20,
-    color: '#333',
-  },
-  datesList: {
-    maxHeight: 300,
-  },
-  dateItem: {
-    padding: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-  },
-  dateText: {
-    fontSize: 16,
-    color: '#333',
-    textAlign: 'center',
-  },
-  languageOption: {
-    padding: 15,
-    borderRadius: 8,
-    marginBottom: 10,
-    backgroundColor: '#f0f0f0',
-    alignItems: 'center',
-  },
-  selectedLanguage: {
-    backgroundColor: '#4CAF50',
-  },
-  languageOptionText: {
-    fontSize: 16,
-    color: '#333',
-    fontWeight: '600',
-  },
-  selectedLanguageText: {
-    color: '#fff',
-  },
-  closeButton: {
-    backgroundColor: '#666',
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  closeButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-  },
-  loader: {
-    marginVertical: 20,
-  },
-  loadingOverlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-});
-
-export default Profile;
+export default ProfilePage;
