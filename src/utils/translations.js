@@ -71,7 +71,25 @@ export const translations = {
     selectConsultationDate: 'परामर्श तिथि चुनें',
     minutes: 'मिनट',
     activity: 'गतिविधि',
-    medicineName: 'दवा का नाम'
+    medicineName: 'दवा का नाम',
+    
+    // Login Page
+    welcomeBack: 'स्वागत है',
+    loginInstruction: 'कृपया अपना फोन नंबर दर्ज करें',
+    phoneNumber: 'फोन नंबर',
+    sendOtp: 'OTP भेजें',
+    resendOtp: 'OTP दोबारा भेजें',
+    verifyOtp: 'OTP सत्यापित करें',
+    otpSentTo: 'OTP भेजा गया:',
+    verifyAndLogin: 'सत्यापित करें और लॉगिन करें',
+    loginHelp: 'लॉगिन में समस्या? संपर्क करें',
+    phoneRequired: 'फोन नंबर आवश्यक है',
+    invalidPhone: 'कृपया वैध फोन नंबर दर्ज करें',
+    invalidOtp: 'कृपया 4 अंकों का OTP दर्ज करें',
+    otpSendFailed: 'OTP भेजने में विफल',
+    loginFailed: 'लॉगिन विफल',
+    invalidCredentials: 'गलत OTP',
+    networkError: 'नेटवर्क त्रुटि'
   },
   english: {
     // Profile Page
@@ -145,7 +163,25 @@ export const translations = {
     selectConsultationDate: 'Select Consultation Date',
     minutes: 'minutes',
     activity: 'Activity',
-    medicineName: 'Medicine Name'
+    medicineName: 'Medicine Name',
+    
+    // Login Page
+    welcomeBack: 'Welcome Back',
+    loginInstruction: 'Please enter your phone number',
+    phoneNumber: 'Phone Number',
+    sendOtp: 'Send OTP',
+    resendOtp: 'Resend OTP',
+    verifyOtp: 'Verify OTP',
+    otpSentTo: 'OTP sent to:',
+    verifyAndLogin: 'Verify and Login',
+    loginHelp: 'Having trouble logging in? Contact us',
+    phoneRequired: 'Phone number is required',
+    invalidPhone: 'Please enter a valid phone number',
+    invalidOtp: 'Please enter 4-digit OTP',
+    otpSendFailed: 'Failed to send OTP',
+    loginFailed: 'Login failed',
+    invalidCredentials: 'Invalid OTP',
+    networkError: 'Network error'
   }
 };
 
