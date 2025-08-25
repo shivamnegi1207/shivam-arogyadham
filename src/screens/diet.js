@@ -99,6 +99,8 @@ const DietPage = ({ navigation }) => {
                   </View>
                 ))}
               </View>
+            )
+            }
 
             {/* General Diet Tips */}
             <View style={{backgroundColor:'white',padding:20,borderRadius:10,marginBottom:20}}>
