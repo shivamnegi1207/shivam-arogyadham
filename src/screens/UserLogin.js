@@ -1,12 +1,11 @@
 import { Image, Pressable, ScrollView, Text, View } from "react-native";
 import { UserLoginStyle } from "../styles/userLogin";
-import { TextInput, Modal, Portal } from "react-native-paper";
+import { TextInput } from "react-native-paper";
 import { useContext, useState } from "react";
 import { Context as AuthContext } from '../context/AuthContext';
 import { Context as LanguageContext } from '../context/LanguageContext';
 import { axiosLocal } from "../config/axios";
 import CommonButton from "../components/commonBtn";
-import ReactNativeOTPInput from "../components/otpInput";
 import { getTranslation } from "../utils/translations";
 import { CommonActions } from "@react-navigation/native";
 
@@ -14,11 +13,9 @@ const UserLoginPage = ({ navigation }) => {
   const { signin } = useContext(AuthContext);
   const { state: langState, loadLanguage } = useContext(LanguageContext);
   
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [otp, setOtp] = useState('');
+  const [userName, setUserName] = useState('');
+  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [otpSent, setOtpSent] = useState(false);
-  const [showModal, setShowModal] = useState(false);
   const [error, setError] = useState('');
 
   useState(() => {
@@ -27,57 +24,30 @@ const UserLoginPage = ({ navigation }) => {
 
   const t = (key) => getTranslation(langState.language, key);
 
-  const validatePhoneNumber = (phone) => {
-    const phoneRegex = /^[6-9]\d{9}$/;
-    return phoneRegex.test(phone);
+  const validateInputs = () => {
+    if (!userName.trim()) {
+      setError(t('userNameRequired'));
+      return false;
+    }
+    if (!password.trim()) {
+      setError(t('passwordRequired'));
+      return false;
+    }
+    return true;
   };
 
-  const handleSendOTP = async () => {
+  const handleLogin = async () => {
     setError('');
     
-    if (!phoneNumber.trim()) {
-      setError(t('phoneRequired'));
-      return;
-    }
-
-    if (!validatePhoneNumber(phoneNumber)) {
-      setError(t('invalidPhone'));
-      return;
-    }
-
-    setLoading(true);
-    try {
-      const response = await axiosLocal.post('/sendOTP', {
-        phoneNumber: phoneNumber
-      });
-
-      if (response.data && response.data.message === "OTP sent successfully.") {
-        setOtpSent(true);
-        setShowModal(true);
-      } else {
-        setError(response.data?.message || t('otpSendFailed'));
-      }
-    } catch (err) {
-      console.warn('Send OTP Error:', err);
-      setError(err.response?.data?.message || t('networkError'));
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleVerifyOTP = async () => {
-    setError('');
-    
-    if (!otp.trim() || otp.length !== 4) {
-      setError(t('invalidOtp'));
+    if (!validateInputs()) {
       return;
     }
 
     setLoading(true);
     try {
       const response = await axiosLocal.post('/login', {
-        userName: phoneNumber,
-        password: otp
+        userName: userName.trim(),
+        password: password.trim()
       });
 
       if (response.data && response.data.token) {
@@ -85,11 +55,10 @@ const UserLoginPage = ({ navigation }) => {
           token: response.data.token,
           fullName: response.data.fullName || 'User',
           role: response.data.role || 'Patient',
-          phoneNumber: phoneNumber,
-          registrationNumber: response.data.registrationNumber || ''
+          phoneNumber: password,
+          registrationNumber: userName
         });
 
-        setShowModal(false);
         navigation.dispatch(
           CommonActions.reset({
             index: 0,
@@ -105,11 +74,6 @@ const UserLoginPage = ({ navigation }) => {
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleResendOTP = async () => {
-    setOtp('');
-    await handleSendOTP();
   };
 
   return (
@@ -133,80 +97,38 @@ const UserLoginPage = ({ navigation }) => {
       ) : null}
 
       <TextInput
-        label={t('phoneNumber')}
-        value={phoneNumber}
-        onChangeText={setPhoneNumber}
-        keyboardType="phone-pad"
-        maxLength={10}
+        label={t('userName')}
+        value={userName}
+        onChangeText={setUserName}
         style={UserLoginStyle.inputText}
         mode="outlined"
-        disabled={otpSent}
-        left={<TextInput.Icon icon="phone" />}
+        disabled={loading}
+        left={<TextInput.Icon icon="account" />}
+        placeholder={t('userNamePlaceholder')}
+      />
+
+      <TextInput
+        label={t('password')}
+        value={password}
+        onChangeText={setPassword}
+        keyboardType="phone-pad"
+        style={UserLoginStyle.inputText}
+        mode="outlined"
+        disabled={loading}
+        left={<TextInput.Icon icon="lock" />}
+        placeholder={t('passwordPlaceholder')}
+        secureTextEntry={false}
       />
 
       <CommonButton 
-        title={otpSent ? t('resendOtp') : t('sendOtp')}
-        onpress={otpSent ? handleResendOTP : handleSendOTP}
+        title={t('login')}
+        onpress={handleLogin}
         disabled={loading}
       />
 
       <Text style={UserLoginStyle.linkText}>
         {t('loginHelp')}
       </Text>
-
-      {/* OTP Verification Modal */}
-      <Portal>
-        <Modal 
-          visible={showModal} 
-          onDismiss={() => setShowModal(false)}
-          contentContainerStyle={{
-            backgroundColor: 'white',
-            margin: 20,
-            padding: 30,
-            borderRadius: 15,
-            alignItems: 'center'
-          }}
-        >
-          <Image 
-            source={require('../../assets/images/check.png')} 
-            resizeMode='contain' 
-            style={UserLoginStyle.modalImage}
-          />
-          
-          <Text style={UserLoginStyle.heading}>
-            {t('verifyOtp')}
-          </Text>
-          
-          <Text style={[UserLoginStyle.text, { textAlign: 'center', marginBottom: 20 }]}>
-            {t('otpSentTo')} {phoneNumber}
-          </Text>
-
-          {error ? (
-            <Text style={[UserLoginStyle.errorText, { textAlign: 'center' }]}>
-              {error}
-            </Text>
-          ) : null}
-
-          <ReactNativeOTPInput 
-            OTP={otp}
-            handleOTP={setOtp}
-          />
-
-          <CommonButton 
-            title={t('verifyAndLogin')}
-            onpress={handleVerifyOTP}
-            disabled={loading || otp.length !== 4}
-            style={UserLoginStyle.closeModalBtn}
-            textStyle={UserLoginStyle.closeModalBtnText}
-          />
-
-          <Pressable onPress={handleResendOTP} disabled={loading}>
-            <Text style={[UserLoginStyle.link, { marginTop: 15, textAlign: 'center' }]}>
-              {t('resendOtp')}
-            </Text>
-          </Pressable>
-        </Modal>
-      </Portal>
     </ScrollView>
   );
 };
